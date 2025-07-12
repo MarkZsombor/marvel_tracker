@@ -23,7 +23,7 @@ func RunMigrations(db *sql.DB) error {
 
 	for _, file := range files {
 		filename := filepath.Base(file)
-		
+
 		var count int
 		err := db.QueryRow("SELECT COUNT(*) FROM migrations WHERE filename = ?", filename).Scan(&count)
 		if err != nil {
@@ -36,7 +36,7 @@ func RunMigrations(db *sql.DB) error {
 		}
 
 		log.Printf("Running migration: %s", filename)
-		
+
 		content, err := os.ReadFile(file)
 		if err != nil {
 			return err
@@ -44,7 +44,7 @@ func RunMigrations(db *sql.DB) error {
 
 		// Execute the entire migration file as one transaction
 		content_str := string(content)
-		
+
 		// Remove comments and split by semicolon
 		lines := strings.Split(content_str, "\n")
 		var cleanedLines []string
@@ -54,15 +54,15 @@ func RunMigrations(db *sql.DB) error {
 				cleanedLines = append(cleanedLines, line)
 			}
 		}
-		
+
 		if len(cleanedLines) == 0 {
 			continue
 		}
-		
+
 		// Join lines and split by semicolon
 		fullContent := strings.Join(cleanedLines, " ")
 		statements := strings.Split(fullContent, ";")
-		
+
 		for _, stmt := range statements {
 			stmt = strings.TrimSpace(stmt)
 			if stmt == "" {
