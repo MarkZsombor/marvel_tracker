@@ -139,12 +139,12 @@ func TestErrorHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
 		body := w.Body.String()
-		
+
 		// Verify template variables are correctly populated
-		assert.Contains(t, body, "Page Not Found") // title
+		assert.Contains(t, body, "Page Not Found")                                     // title
 		assert.Contains(t, body, "The page you&#39;re looking for doesn&#39;t exist.") // message (HTML escaped)
-		assert.Contains(t, body, "404") // code
-		assert.Contains(t, body, "Back to Home") // link text
+		assert.Contains(t, body, "404")                                                // code
+		assert.Contains(t, body, "Back to Home")                                       // link text
 	})
 
 	t.Run("Different Error Status Codes", func(t *testing.T) {
@@ -193,15 +193,15 @@ func TestErrorHandler(t *testing.T) {
 
 	t.Run("Middleware Chain Order", func(t *testing.T) {
 		r := setupRouter()
-		
+
 		middlewareCalled := false
-		
+
 		// Add another middleware after error handler
 		r.Use(func(c *gin.Context) {
 			middlewareCalled = true
 			c.Next()
 		})
-		
+
 		r.GET("/", func(c *gin.Context) {
 			c.Error(errors.New("test error"))
 			c.AbortWithStatus(http.StatusInternalServerError)

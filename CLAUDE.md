@@ -127,6 +127,20 @@ github.com/stretchr/testify        // Test assertions
 - Focus on learning Go idioms and HTMX patterns
 - Test coverage should be reasonable but not obsessive in early development
 
+## Pre-Commit Checklist
+
+Before making any commit, ensure the following checks pass:
+
+```bash
+# Format all Go files
+go fmt ./...
+
+# Run the full test suite
+go test ./...
+```
+
+Both commands must complete successfully without errors. The GitHub Actions CI will enforce these same checks on all pushes and pull requests.
+
 ## Deployment Considerations
 
 - SQLite database file location and permissions
