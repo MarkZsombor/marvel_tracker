@@ -17,7 +17,7 @@ func setupTestRouter() *gin.Engine {
 	// Load templates explicitly to avoid conflicts between content blocks
 	r.LoadHTMLFiles(
 		"../../templates/index.html",
-		"../../templates/plays.html", 
+		"../../templates/plays.html",
 		"../../templates/new_play.html",
 		"../../templates/error.html",
 	)
