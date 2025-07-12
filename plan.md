@@ -16,14 +16,14 @@ A web application to log and track plays for the Marvel Champions board game, bu
 
 ### 1. Initial Go Setup
 
-- [ ] Initialize Go module (`go mod init marvel_tracker`)
-- [ ] Set up project directory structure
-- [ ] Install core dependencies:
+- [x] Initialize Go module (`go mod init marvel_tracker`)
+- [x] Set up project directory structure
+- [x] Install core dependencies:
   - `github.com/gin-gonic/gin` - Web framework
   - `github.com/mattn/go-sqlite3` - SQLite driver
   - `github.com/stretchr/testify` - Testing assertions
-- [ ] Create basic main.go with Gin server
-- [ ] Set up basic routing structure
+- [x] Create basic main.go with Gin server
+- [x] Set up basic routing structure
 
 ### 2. Project Structure
 
@@ -47,23 +47,23 @@ marvel_tracker/
 
 ### 3. Database Setup
 
-- [ ] Create SQLite database initialization
-- [ ] Design initial schema using a relational model:
+- [x] Create SQLite database initialization
+- [x] Design initial schema using a relational model:
   - **`heroes`** (id, name) - _Master list of heroes._
   - **`scenarios`** (id, name) - _Master list of scenarios._
   - **`plays`** (id, date, outcome, notes, scenario_id, difficulty) - _Records a single game session, linking to one scenario._
   - **`decks`** (id, play_id, hero_id, aspect) - _Links a play to the heroes used, storing play-specific data like the aspect._
 - [ ] Plan for seeding initial `heroes` and `scenarios` data (e.g., via migration).
-- [ ] Set up database connection and basic CRUD operations for the models.
-- [ ] Create a simple migration system.
+- [x] Set up database connection and basic CRUD operations for the models.
+- [x] Create a simple migration system.
 
 ### 4. Basic Web Server
 
-- [ ] Set up Gin router with basic routes
-- [ ] Configure HTML template rendering
-- [ ] Create basic layout template
-- [ ] Set up static file serving
-- [ ] Implement basic error handling
+- [x] Set up Gin router with basic routes
+- [x] Configure HTML template rendering
+- [x] Create basic layout template
+- [x] Set up static file serving
+- [x] Implement basic error handling
 
 ## Phase 2: Frontend Integration
 
