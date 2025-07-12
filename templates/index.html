@@ -1,0 +1,22 @@
+{{template "layout.html" .}}
+
+{{define "content"}}
+<div class="text-center">
+    <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to Marvel Champions Play Tracker</h2>
+    <p class="text-gray-600 mb-8">Track your Marvel Champions board game plays and statistics.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">View Plays</h3>
+            <p class="text-gray-600 mb-4">Browse your play history and statistics.</p>
+            <a href="/plays" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">View Plays</a>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Log New Play</h3>
+            <p class="text-gray-600 mb-4">Record a new game session.</p>
+            <a href="/plays/new" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">New Play</a>
+        </div>
+    </div>
+</div>
+{{end}}
