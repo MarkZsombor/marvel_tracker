@@ -91,4 +91,128 @@ func TestErrorHandler(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 		assert.Contains(t, w.Body.String(), "An Unexpected Error Occurred")
 	})
+
+	t.Run("Multiple Errors in Chain", func(t *testing.T) {
+		r := setupRouter()
+		r.GET("/", func(c *gin.Context) {
+			c.Error(errors.New("first error"))
+			c.Error(errors.New("second error"))
+			c.Error(errors.New("last error"))
+			c.AbortWithStatus(http.StatusInternalServerError)
+		})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Contains(t, w.Body.String(), "Internal Server Error")
+		// The middleware should handle the last error in the chain
+	})
+
+	t.Run("Error Without Status Set", func(t *testing.T) {
+		r := setupRouter()
+		r.GET("/", func(c *gin.Context) {
+			c.Error(errors.New("error without status"))
+			// Don't set any status - should remain 200
+		})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		r.ServeHTTP(w, req)
+
+		// When no status is set but errors exist, response should still be 200
+		// The middleware only acts on errors when status codes indicate errors
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Error Template Data", func(t *testing.T) {
+		r := setupRouter()
+		r.GET("/", func(c *gin.Context) {
+			c.Error(errors.New("test error"))
+			c.AbortWithStatus(http.StatusNotFound)
+		})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusNotFound, w.Code)
+		body := w.Body.String()
+		
+		// Verify template variables are correctly populated
+		assert.Contains(t, body, "Page Not Found") // title
+		assert.Contains(t, body, "The page you&#39;re looking for doesn&#39;t exist.") // message (HTML escaped)
+		assert.Contains(t, body, "404") // code
+		assert.Contains(t, body, "Back to Home") // link text
+	})
+
+	t.Run("Different Error Status Codes", func(t *testing.T) {
+		testCases := []struct {
+			status       int
+			expectedText string
+		}{
+			{http.StatusUnauthorized, "An Unexpected Error Occurred"},
+			{http.StatusForbidden, "An Unexpected Error Occurred"},
+			{http.StatusBadRequest, "An Unexpected Error Occurred"},
+			{http.StatusConflict, "An Unexpected Error Occurred"},
+			{http.StatusServiceUnavailable, "An Unexpected Error Occurred"},
+		}
+
+		for _, tc := range testCases {
+			r := setupRouter()
+			r.GET("/", func(c *gin.Context) {
+				c.Error(errors.New("test error"))
+				c.AbortWithStatus(tc.status)
+			})
+
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/", nil)
+			r.ServeHTTP(w, req)
+
+			assert.Equal(t, tc.status, w.Code)
+			assert.Contains(t, w.Body.String(), tc.expectedText)
+		}
+	})
+
+	t.Run("Success Status with Error Should Not Trigger Handler", func(t *testing.T) {
+		r := setupRouter()
+		r.GET("/", func(c *gin.Context) {
+			c.Error(errors.New("error with success status"))
+			c.String(http.StatusOK, "Success Response")
+		})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		r.ServeHTTP(w, req)
+
+		// Should return the success response, error handler still processes but doesn't override
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Contains(t, w.Body.String(), "Success Response")
+	})
+
+	t.Run("Middleware Chain Order", func(t *testing.T) {
+		r := setupRouter()
+		
+		middlewareCalled := false
+		
+		// Add another middleware after error handler
+		r.Use(func(c *gin.Context) {
+			middlewareCalled = true
+			c.Next()
+		})
+		
+		r.GET("/", func(c *gin.Context) {
+			c.Error(errors.New("test error"))
+			c.AbortWithStatus(http.StatusInternalServerError)
+		})
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.True(t, middlewareCalled)
+		assert.Contains(t, w.Body.String(), "Internal Server Error")
+	})
 }
